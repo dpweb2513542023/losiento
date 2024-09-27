@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego de Disculpas Personalizado</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background-color: #fff8e1;
+            text-align: center;
+            padding: 50px;
+            color: #555;
+        }
+        
+        h1 {
+            color: #ff6b6b;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+        
+        p {
+            font-size: 1.2em;
+            color: #444;
+            margin-bottom: 30px;
+        }
+        
+        input[type="number"] {
+            padding: 10px;
+            font-size: 18px;
+            border-radius: 8px;
+            border: 2px solid #ff6b6b;
+            margin-right: 10px;
+            width: 80px;
+            text-align: center;
+        }
+        
+        button {
+            padding: 10px 20px;
+            font-size: 18px;
+            color: white;
+            background-color: #ff6b6b;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        
+        button:hover {
+            background-color: #ff4b4b;
+        }
+        
+        .message {
+            margin-top: 20px;
+            font-size: 1.5em;
+            color: #ff6b6b;
+        }
+        
+        .image-container {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .image-container img {
+            width: 100px;
+            margin: 10px;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .image-container img:hover {
+            transform: scale(1.1);
+        }
+        
+        .personal-photo {
+            margin-top: 30px;
+            width: 150px;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            display: none;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .heart {
+            position: absolute;
+            color: red;
+            font-size: 24px;
+            animation: beat 1s infinite;
+        }
+        
+        @keyframes beat {
+            0%,
+            100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+        }
+        
+        .heart-container {
+            position: relative;
+            display: inline-block;
+            margin-top: 30px;
+        }
+        
+        .perdon-container {
+            display: none;
+            margin-top: 30px;
+        }
+        
+        .perdon-container button {
+            background-color: #28a745;
+        }
+        
+        .perdon-container button:hover {
+            background-color: #218838;
+        }
+        
+        .perdon-message {
+            font-size: 1.3em;
+            color: #333;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>🎮 Juego de Disculpas 💐</h1>
+    <p>Adivina cuántas flores te regalaré para disculparme. Si aciertas, ¡tendrás un mensaje especial! 🌸</p>
+
+    <input type="number" id="guess" placeholder="Tu respuesta" min="1" max="10">
+    <button onclick="adivinar()">Adivinar</button>
+
+    <div class="message" id="disculpaMensaje"></div>
+
+    <div class="image-container" id="florContainer"></div>
+
+    <!-- Contenedor de la imagen con corazones -->
+    <div class="heart-container" id="heartContainer">
+        <img src="triste.jpeg" alt="Mi Foto" class="personal-photo" id="fotoSorpresa">
+        <!-- Corazones alrededor de la imagen -->
+        <span class="heart" style="top: -20px; left: -20px;">❤️</span>
+        <span class="heart" style="top: -20px; right: -20px;">❤️</span>
+        <span class="heart" style="bottom: -20px; left: -20px;">❤️</span>
+        <span class="heart" style="bottom: -20px; right: -20px;">❤️</span>
+        <span class="heart" style="top: -40px; left: 50%;">❤️</span>
+        <span class="heart" style="bottom: -40px; left: 50%;">❤️</span>
+    </div>
+
+    <!-- Contenedor de disculpa -->
+    <div class="perdon-container" id="perdonContainer">
+        <h2>💔 Lo siento mucho 💔</h2>
+        <p class="perdon-message">
+            Perdóname por mi comportamiento caprichoso. 🙏 Te prometo que cambiaré y seré mejor. ¿Aceptarías estar conmigo nuevamente?
+        </p>
+        <button onclick="aceptar()">Aceptar</button>
+        <button id="rechazarButton" onmouseover="moverRechazar()">Rechazar</button>
+    </div>
+
+    <script>
+        // Genera el número aleatorio de flores solo una vez
+        const numeroFlores = Math.floor(Math.random() * 10) + 1; // Genera un número aleatorio entre 1 y 10
+        console.log("Número de flores generado: ", numeroFlores); // Para verificar en la consola
+
+        function adivinar() {
+            const adivinanza = parseInt(document.getElementById('guess').value); // Obtener el valor ingresado por el usuario
+            const mensaje = document.getElementById('disculpaMensaje');
+            const florContainer = document.getElementById('florContainer');
+            florContainer.innerHTML = ""; // Limpiar el contenedor de flores
+
+            // Sin importar el número ingresado, el jugador siempre acertará
+            mensaje.innerHTML = "¡Acertaste! Aquí están tus flores <span class='heart'>❤️</span>";
+            mostrarFlores(adivinanza); // Mostrar el número ingresado por el usuario
+            mostrarSorpresa();
+            mostrarDisculpa();
+        }
+
+        function mostrarFlores(cantidad) {
+            const florContainer = document.getElementById('florContainer');
+            for (let i = 0; i < cantidad; i++) {
+                const img = document.createElement('img');
+                img.src = "flores.jpg"; // Cambia la URL de las flores
+                img.alt = "Flor";
+                florContainer.appendChild(img);
+            }
+        }
+
+        function mostrarSorpresa() {
+            const foto = document.getElementById('fotoSorpresa');
+            foto.style.display = "block"; // Muestra la foto sorpresa
+        }
+
+        function mostrarDisculpa() {
+            const perdonContainer = document.getElementById('perdonContainer');
+            perdonContainer.style.display = "block"; // Muestra el mensaje de disculpa
+        }
+
+        function aceptar() {
+            alert("¡Gracias por aceptar! Prometo que cambiaré y seré mejor para ti ❤️");
+        }
+
+        function rechazar() {
+            alert("Entiendo tu decisión. Lo siento mucho 😔");
+        }
+
+        function moverRechazar() {
+            const button = document.getElementById('rechazarButton');
+            // Generar nuevas posiciones aleatorias dentro del contenedor
+            const randomX = Math.floor(Math.random() * 80); // 80% del ancho de la pantalla
+            const randomY = Math.floor(Math.random() * 40); // 40% de la altura de la pantalla
+            button.style.position = "absolute";
+            button.style.top = `${randomY}vh`; // 0-40% de la altura de la ventana
+            button.style.left = `${randomX}vw`; // 0-80% de la anchura de la ventana
+        }
+    </script>
+
+</body>
+
+</html>
